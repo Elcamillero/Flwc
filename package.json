@@ -1,0 +1,43 @@
+{
+  "name": "fantasy-league-world-cup",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "contracts:compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy-sepolia.mjs --network sepolia",
+    "deploy:base": "hardhat run scripts/deploy-base.mjs --network base",
+    "deploy:match-predictions": "hardhat run scripts/deploy-match-predictions.mjs --network base",
+    "bot": "node bot/settle-bot.mjs",
+    "footballevo": "powershell -ExecutionPolicy Bypass -File scripts/launch-footballevo.ps1",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.6.1",
+    "cheerio": "^1.2.0",
+    "lucide-react": "^1.17.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@nomicfoundation/hardhat-ethers": "^4.0.12",
+    "@types/node": "^24.12.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "dotenv": "^17.4.2",
+    "eslint": "^10.3.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "ethers": "^6.16.0",
+    "globals": "^17.6.0",
+    "hardhat": "^3.7.0",
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.59.2",
+    "vite": "^8.0.12"
+  }
+}

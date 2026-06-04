@@ -1,0 +1,256 @@
+{
+  "network": "base",
+  "chainId": 8453,
+  "deployedAt": "2026-06-03T18:59:23.936Z",
+  "deployer": "0x59357082838529bBf4128A1646FC6366Ab0BD15d",
+  "contracts": {
+    "vault": "0x05060b2965250f3d85478f0281cC99b592e17aaD",
+    "token": "0x123FcF3c915292058ab257F1c1Db04625fa4f894",
+    "playerRegistry": "0x9A1Ade11B58e68C27748E9D6e1EE34b564B4C269",
+    "matchRegistry": "0xF417347cA173fD01477C5ED6C70727999944A1d7",
+    "matchPredictions": "0x9D2923d0b9FE24B11c31A42d56ad852C49705C33",
+    "championPool": "0x908C17c26D2Bc78335Ac7B3dAb0CfcdAC6b9750C"
+  },
+  "teams": [
+    {
+      "name": "Czech Republic",
+      "group": "Group A",
+      "id": "0x645cf7589e4a6bf152d751492975d852e3c584da5e73214c9a75f405206c6a32"
+    },
+    {
+      "name": "Mexico",
+      "group": "Group A",
+      "id": "0xca6c7b5ef147f43f044edb3753258463e0f2032cd22dc09c29ab036820cc38ea"
+    },
+    {
+      "name": "South Africa",
+      "group": "Group A",
+      "id": "0xce9c8a7d88d689bee26000fb5dfb15eba3d3fed1ef79f4888c99468caa61ff92"
+    },
+    {
+      "name": "South Korea",
+      "group": "Group A",
+      "id": "0xcebdd3725d4a14a07aeab45cc88f8c6813d64a253acfd059ccda2c2ecfd9a919"
+    },
+    {
+      "name": "Bosnia and Herzegovina",
+      "group": "Group B",
+      "id": "0x8f5e7e3d13e7fea4f54e09585e7ba8abb54ea859e3eb90890e68fe8b4f2ee17b"
+    },
+    {
+      "name": "Canada",
+      "group": "Group B",
+      "id": "0x3fdb8777c01384990a0f9b84655b2bca7b42e85be71ae9c9bb58d95ed99fd145"
+    },
+    {
+      "name": "Qatar",
+      "group": "Group B",
+      "id": "0x4023b7bfc68106c59845f70c966539e15729e42b91568e102226d7b1db7f3d8e"
+    },
+    {
+      "name": "Switzerland",
+      "group": "Group B",
+      "id": "0x5cca45e7a8fefec8884c8bb03cf0b1a15222a2435a5b97bdec460e7a823976b5"
+    },
+    {
+      "name": "Brazil",
+      "group": "Group C",
+      "id": "0x5577c8b9fd5709604e35a1dc79acbcacc4aa66098da464a27c4da3ffebbc9e72"
+    },
+    {
+      "name": "Haiti",
+      "group": "Group C",
+      "id": "0x2865878627510d26ba184a085c1c7a852b3116543aa94fdbb21c3cea905e7123"
+    },
+    {
+      "name": "Morocco",
+      "group": "Group C",
+      "id": "0x5348fac626768a69919f7387f5fee2442ad8323ffd3368274a89450aaac6196b"
+    },
+    {
+      "name": "Scotland",
+      "group": "Group C",
+      "id": "0x48ab751bbfa887b8c34a870f007b6022059340c388a032b1a18b15ab2071f6c8"
+    },
+    {
+      "name": "Australia",
+      "group": "Group D",
+      "id": "0x5f89d36f8f3779c841cc74bb4fe001957835109e364700eee16c991879bd031e"
+    },
+    {
+      "name": "Paraguay",
+      "group": "Group D",
+      "id": "0xf86b956f7b43b1a50d25748ae34d6298ad09f229e3fea5993ae6da714d83197c"
+    },
+    {
+      "name": "Turkey",
+      "group": "Group D",
+      "id": "0x90b261b6ab5681b063008ccff2c5faf6b688498ca46d4d32f253974b259e0065"
+    },
+    {
+      "name": "United States",
+      "group": "Group D",
+      "id": "0xbb52389162ecedd2494b5dd1e054ff3f87128916e867ec94bb6a5bcb4254e1d3"
+    },
+    {
+      "name": "Curaçao",
+      "group": "Group E",
+      "id": "0xcf17a40fba2c783de1fda9abd7754d0c7950a90e72181b2ece3a51dff40b6a0b"
+    },
+    {
+      "name": "Ecuador",
+      "group": "Group E",
+      "id": "0x59368f8f952d12841d4e3ee30b45dae439365fbda4d3a85b66548a723351423d"
+    },
+    {
+      "name": "Germany",
+      "group": "Group E",
+      "id": "0x303bd331342aa9403d7d37a2a37baaf01ce7acecd4cfe8676ef2fc5cbd22e5fb"
+    },
+    {
+      "name": "Ivory Coast",
+      "group": "Group E",
+      "id": "0x54b88f7a5c77563704d8f2ee3f2ea731fd93d9329f2edb7006c13d3c14b8d7b6"
+    },
+    {
+      "name": "Japan",
+      "group": "Group F",
+      "id": "0xb3f577a7466d66151aaf4e31828c4d745c766dd8746307b14f848ea3ba5fd16f"
+    },
+    {
+      "name": "Netherlands",
+      "group": "Group F",
+      "id": "0xa4821d8232f8538b11e5db012cd455c6c5e0521200ae43817788700758170afa"
+    },
+    {
+      "name": "Sweden",
+      "group": "Group F",
+      "id": "0x450a387230f84599f45f8364e7f915955f5f8b706cb0893a25d8ecc8fe4edc6a"
+    },
+    {
+      "name": "Tunisia",
+      "group": "Group F",
+      "id": "0x75aafd57ec12e8db3aa6004c3d87c87113d95d2032064cc75635dcf3ec669bcc"
+    },
+    {
+      "name": "Belgium",
+      "group": "Group G",
+      "id": "0x675fc0f36437113414527edab4055ad79d59e84821070a08296018c9121fb199"
+    },
+    {
+      "name": "Egypt",
+      "group": "Group G",
+      "id": "0x559bb3ef76007dc883fa3b139c9a3c58a0083f7742936b361ce36e01b12fcbac"
+    },
+    {
+      "name": "Iran",
+      "group": "Group G",
+      "id": "0xcf50d57f50dc7aef8cf1d8a0c16e473c4895577d55d61b0ca1a48985c2243959"
+    },
+    {
+      "name": "New Zealand",
+      "group": "Group G",
+      "id": "0x11f450e53152e8d8b82a283cf9d9f794bdba621fab1afd31fe130f8712ffd6d9"
+    },
+    {
+      "name": "Cape Verde",
+      "group": "Group H",
+      "id": "0x5077dc9597e22ff5aa9f461005f56cf4c020f1d367f8fb5862dcd3489563d9d8"
+    },
+    {
+      "name": "Saudi Arabia",
+      "group": "Group H",
+      "id": "0x20acfd283e7a2c4b2efee591f76f1e4dea64773cb569549abcbb4171640f1e7e"
+    },
+    {
+      "name": "Spain",
+      "group": "Group H",
+      "id": "0x9030dfe7448c0cdbff692f306dda735f4c701b1f98897592a233600d03a13b26"
+    },
+    {
+      "name": "Uruguay",
+      "group": "Group H",
+      "id": "0x4224d25e53072709034cdd73294cc111abf13b0c7447241faf387d1669350ac7"
+    },
+    {
+      "name": "France",
+      "group": "Group I",
+      "id": "0x622095092e68c138435bf591bef3950673345fd17caee19dd7266560dd251554"
+    },
+    {
+      "name": "Iraq",
+      "group": "Group I",
+      "id": "0xcf2a916e7c42824ac803562e5fbae27a6a4f80e2fad7ee526d1d69a7aa611ce2"
+    },
+    {
+      "name": "Norway",
+      "group": "Group I",
+      "id": "0xff9998addeedc160dae240dad3e2d46d8178ed6baf94696519ef5f93c400f141"
+    },
+    {
+      "name": "Senegal",
+      "group": "Group I",
+      "id": "0xb0fa40640d4e30c97cac7b29b523b723a1b9e4ccf35cab1b6ec0863a690a27a2"
+    },
+    {
+      "name": "Algeria",
+      "group": "Group J",
+      "id": "0x3c387fb9f49a4c308b8ff1a04d42064cdc49fde2fccd464171e447b1293ae390"
+    },
+    {
+      "name": "Argentina",
+      "group": "Group J",
+      "id": "0x70e8d3b76980baca89c8c14e695981251ba64ec07ae1721d9045fc0a9199d0ef"
+    },
+    {
+      "name": "Austria",
+      "group": "Group J",
+      "id": "0x78696f51f3a49cd75355c62fbefba1986390a71428d95caf05815c0899ceda0a"
+    },
+    {
+      "name": "Jordan",
+      "group": "Group J",
+      "id": "0x9e8e140db798c6bde78fd54947607d09a520ee63478b0931e70cc617c01f1556"
+    },
+    {
+      "name": "Colombia",
+      "group": "Group K",
+      "id": "0x0e6520bd8354309754fc4457ce0d1d4702b76ceb09aa4d047b75e61918fe4435"
+    },
+    {
+      "name": "DR Congo",
+      "group": "Group K",
+      "id": "0x3751675fd4e242bea2a695a191a0a0d69258c45bdcaa88b09edd67157b15eecc"
+    },
+    {
+      "name": "Portugal",
+      "group": "Group K",
+      "id": "0xc608c8df52ecaa80a36f631ab07a55b04dc8c04ea4d60717e1fee7764fe26a69"
+    },
+    {
+      "name": "Uzbekistan",
+      "group": "Group K",
+      "id": "0x96ee418bb9ca45bbe1806aaf636951a5cb254a37c5354a0894b52ce08eb6bf84"
+    },
+    {
+      "name": "Croatia",
+      "group": "Group L",
+      "id": "0x04697273a262b2989824c53ab4befaa322a3764163c1937abaa6af9c81dfc83e"
+    },
+    {
+      "name": "England",
+      "group": "Group L",
+      "id": "0xfbac3ae964e13d82b6f1fbf0db337635bad470b532d0c2e69084dbb64130fdfc"
+    },
+    {
+      "name": "Ghana",
+      "group": "Group L",
+      "id": "0xdd5607dabbc8463b4d725c9a5f18075ba58e7b52ef092dee1a5d85593f19cb1a"
+    },
+    {
+      "name": "Panama",
+      "group": "Group L",
+      "id": "0x6b831152e10d70962c6e267c547e2546b1e186dc1314ce34646aa5f2a6180348"
+    }
+  ]
+}

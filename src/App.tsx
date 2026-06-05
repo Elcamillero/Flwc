@@ -19,6 +19,7 @@ import { FootballEvoBroadcast } from './FootballEvoBroadcast'
 import { useWallet } from './hooks/useWallet'
 import { usePredictions } from './hooks/usePredictions'
 import { useMatchPredictions } from './hooks/useMatchPredictions'
+import { useMyBets } from './hooks/useMyBets'
 import { useMatchSeed } from './hooks/useMatchSeed'
 import './App.css'
 
@@ -481,6 +482,7 @@ function App() {
   const [matchPools] = useState<MatchPools>({ home: 0, draw: 0, away: 0 })
   const [champPickTeam, setChampPickTeam] = useState('')
   const [champStakeEth, setChampStakeEth] = useState('0.01')
+  const [champSearch, setChampSearch] = useState('')
   const [settleTeam, setSettleTeam] = useState('')
   const [tick, setTick] = useState(0)
 
@@ -506,6 +508,7 @@ function App() {
   }, [tournamentMatches.length, tick])
 
   const matchPredictions = useMatchPredictions(wallet.signer, wallet.provider, wallet.account, currentCycleNumber)
+  const myBets = useMyBets(wallet.provider, wallet.account)
 
   // Cycle-aware: always pick the match that's currently live for every user
   const epochMs = useMemo(() => new Date(TOURNAMENT_EPOCH).getTime(), [])
@@ -637,6 +640,11 @@ function App() {
               <span className="wallet-addr" title={wallet.account}>
                 {wallet.account.slice(0, 6)}…{wallet.account.slice(-4)}
               </span>
+              {myBets.bets.some(b => b.claimable) && (
+                <a className="claim-alert" href="#my-bets" title="You have winnings to claim!">
+                  🏆 Claim
+                </a>
+              )}
               <button className="wallet-btn ghost" onClick={wallet.disconnect} type="button" title="Disconnect">
                 <LogOut size={14} />
               </button>
@@ -745,27 +753,22 @@ function App() {
                 </button>
               )}
 
-              {/* ── Phase 4: match ended, owner must settle ── */}
+              {/* ── Phase 4: match ended — trustless settle ── */}
               {wallet.account && wallet.isOnBase && !matchPredictions.pool.settled && runtime.isFinal && (
                 <div className="settle-box">
-                  {matchPredictions.isOwner ? (
+                  {matchPredictions.pool.seedCommitted ? (
                     <>
-                      <p className="settle-label">Match ended — pick the result to settle the pool:</p>
-                      <div className="settle-btns">
-                        {(['home', 'draw', 'away'] as MatchOutcome[]).map((o) => (
-                          <button
-                            key={o}
-                            className="place-bet settle-option"
-                            type="button"
-                            onClick={() => matchPredictions.settle(featuredMatch.id, o)}
-                          >
-                            {outcomeLabels[o]} wins
-                          </button>
-                        ))}
-                      </div>
+                      <p className="settle-label">✅ Seed committed — anyone can finalize this pool:</p>
+                      <button
+                        className="place-bet"
+                        type="button"
+                        onClick={() => matchPredictions.settle(featuredMatch.id)}
+                      >
+                        Settle Match (trustless)
+                      </button>
                     </>
                   ) : (
-                    <p className="settle-label">⏳ Waiting for the pool to be settled by the owner…</p>
+                    <p className="settle-label">⏳ Awaiting seed commitment… Bot will settle automatically.</p>
                   )}
                 </div>
               )}
@@ -789,6 +792,17 @@ function App() {
 
               {matchPredictions.txError && (
                 <p className="tx-error">{matchPredictions.txError}</p>
+              )}
+
+              {/* ── FLWC holder fee discount badge ── */}
+              {wallet.account && wallet.isOnBase && (
+                <div className="flwc-badge">
+                  {matchPredictions.pool.isFlwcHolder ? (
+                    <span className="badge holder">⭐ FLWC Holder · 1% fee</span>
+                  ) : (
+                    <span className="badge standard">Standard · 2% fee · Hold 1,000 FLWC for discount</span>
+                  )}
+                </div>
               )}
 
               {/* ── Your current stake info ── */}
@@ -856,6 +870,58 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* ── My Bets — visible right after hero when wallet connected ── */}
+      {wallet.account && (
+        <section className="my-bets-section" id="my-bets">
+          <div className="my-bets-inner">
+            <div className="my-bets-heading">
+              <span><BadgeDollarSign size={16} /> My Bets</span>
+              <small>{myBets.loading ? 'Scanning…' : `${myBets.bets.length} found`}</small>
+            </div>
+
+            {myBets.loading && <p className="bets-empty">Scanning your bet history on Base…</p>}
+            {!myBets.loading && myBets.bets.length === 0 && (
+              <p className="bets-empty">No bets in the last 2 days.</p>
+            )}
+            {!myBets.loading && myBets.bets.length > 0 && (
+              <div className="bets-list">
+                {myBets.bets.map((bet, i) => (
+                  <div key={i} className={`bet-row ${bet.claimable ? 'claimable' : bet.won === false ? 'lost' : bet.won === null ? 'pending' : 'claimed'}`}>
+                    <div className="bet-info">
+                      <strong>{bet.matchLabel}</strong>
+                      <span>
+                        You bet <b>{bet.outcome === 'home' ? bet.home : bet.outcome === 'away' ? bet.away : 'Draw'}</b> · {Number(bet.amount).toFixed(4)} ETH
+                      </span>
+                    </div>
+                    <div className="bet-status">
+                      {!bet.settled && <span className="badge pending">⏳ Live</span>}
+                      {bet.settled && bet.won === false && <span className="badge lost">❌ Lost</span>}
+                      {bet.settled && bet.won === true && bet.claimed && <span className="badge claimed">✅ Claimed</span>}
+                      {bet.claimable && wallet.signer && (
+                        <button
+                          className="place-bet claim-btn"
+                          style={{ padding: '6px 16px', fontSize: 13 }}
+                          onClick={async () => {
+                            const { Contract } = await import('ethers')
+                            const { MATCH_PREDICTIONS_ABI } = await import('./contracts/abis')
+                            const addr = (import.meta.env.VITE_MATCH_PREDICTIONS_ADDRESS as string)?.trim()
+                            const c = new Contract(addr, MATCH_PREDICTIONS_ABI, wallet.signer!)
+                            await (await c.claim(bet.matchId)).wait()
+                            myBets.refresh()
+                          }}
+                        >
+                          🏆 Claim
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       <section className="grid-section">
         <article className="panel live-panel">
@@ -1018,19 +1084,33 @@ function App() {
 
           {predictions.isReady && !predictions.settled && (
             <>
+              {/* Search */}
+              <input
+                className="champ-search"
+                placeholder="🔍  Search team…"
+                value={champSearch}
+                onChange={e => setChampSearch(e.target.value)}
+              />
+
+              {/* All 48 teams */}
               <div className="champ-pool-grid">
-                {predictions.teamPools.slice(0, 16).map((tp) => (
-                  <button
-                    key={tp.teamName}
-                    className={`champ-team-btn ${champPickTeam === tp.teamName ? 'selected' : ''}`}
-                    onClick={() => setChampPickTeam(tp.teamName)}
-                    type="button"
-                  >
-                    <span>{tp.teamName}</span>
-                    <small>{Number(tp.poolEth) > 0 ? `${Number(tp.poolEth).toFixed(3)} ETH` : '—'}</small>
-                    {Number(tp.myStakeEth) > 0 && <em>You: {Number(tp.myStakeEth).toFixed(3)}</em>}
-                  </button>
-                ))}
+                {(predictions.teamPools.length > 0
+                  ? predictions.teamPools
+                  : roster.teams.map(t => ({ teamName: t.name, teamId: '', poolEth: '0', myStakeEth: '0' }))
+                )
+                  .filter(tp => tp.teamName.toLowerCase().includes(champSearch.toLowerCase()))
+                  .map((tp) => (
+                    <button
+                      key={tp.teamName}
+                      className={`champ-team-btn ${champPickTeam === tp.teamName ? 'selected' : ''}`}
+                      onClick={() => setChampPickTeam(tp.teamName)}
+                      type="button"
+                    >
+                      <span>{tp.teamName}</span>
+                      <small>{Number(tp.poolEth) > 0 ? `${Number(tp.poolEth).toFixed(3)} ETH` : '—'}</small>
+                      {Number(tp.myStakeEth) > 0 && <em>You: {Number(tp.myStakeEth).toFixed(3)}</em>}
+                    </button>
+                  ))}
               </div>
 
               {!wallet.account ? (
@@ -1178,6 +1258,8 @@ function App() {
             ))}
           </ol>
         </article>
+
+
       </section>
     </main>
   )

@@ -60,6 +60,17 @@ export function useWallet(): WalletState {
     setError(null)
     try {
       await eth.request({ method: 'eth_requestAccounts' })
+
+      // Auto-switch to Base right after connecting
+      try {
+        await eth.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_HEX }] })
+      } catch (switchErr: any) {
+        // Chain not added yet — add it automatically
+        if (switchErr.code === 4902) {
+          await eth.request({ method: 'wallet_addEthereumChain', params: [BASE_NETWORK_PARAMS] })
+        }
+      }
+
       const bp = new BrowserProvider(eth)
       setProvider(bp)
       await refresh(bp)

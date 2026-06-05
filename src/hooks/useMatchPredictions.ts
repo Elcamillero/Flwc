@@ -14,7 +14,9 @@ export type MatchPool = {
   away: string
   settled: boolean
   winner: Outcome | null
+  seedCommitted: boolean
   myStake: Record<Outcome, string>
+  isFlwcHolder: boolean
 }
 
 export type UseMatchPredictionsReturn = {
@@ -24,15 +26,16 @@ export type UseMatchPredictionsReturn = {
   isPlacing: boolean
   txError: string | null
   placeBet: (matchId: string, outcome: Outcome, ethAmount: string) => Promise<void>
-  settle: (matchId: string, outcome: Outcome) => Promise<void>
+  settle: (matchId: string) => Promise<void>
   claim: (matchId: string) => Promise<void>
   refresh: (matchId: string) => Promise<void>
 }
 
 const EMPTY_POOL: MatchPool = {
   home: '0', draw: '0', away: '0',
-  settled: false, winner: null,
+  settled: false, winner: null, seedCommitted: false,
   myStake: { home: '0', draw: '0', away: '0' },
+  isFlwcHolder: false,
 }
 
 function matchIdBytes(matchId: string, cycle: number) {
@@ -74,21 +77,27 @@ export function useMatchPredictions(
         c.owner(),
       ])
 
-      const homePool  = poolResult[0]
-      const drawPool  = poolResult[1]
-      const awayPool  = poolResult[2]
-      const settled   = poolResult[3]
-      const winnerIdx = Number(poolResult[4])
+      const homePool     = poolResult[0]
+      const drawPool     = poolResult[1]
+      const awayPool     = poolResult[2]
+      const settled      = poolResult[3]
+      const winnerIdx    = Number(poolResult[4])
+      const seedCommitted = poolResult[5]
 
       const outcomes: Outcome[] = ['home', 'draw', 'away']
       const myStake: Record<Outcome, string> = { home: '0', draw: '0', away: '0' }
+      let isFlwcHolder = false
 
       if (account) {
         setIsOwner((ownerAddr as string).toLowerCase() === account.toLowerCase())
-        const stakeResult = await c.myStakes(bid, account)
+        const [stakeResult, holderResult] = await Promise.all([
+          c.myStakes(bid, account),
+          c.isFlwcHolder(account),
+        ])
         myStake.home = formatEther(stakeResult[0])
         myStake.draw = formatEther(stakeResult[1])
         myStake.away = formatEther(stakeResult[2])
+        isFlwcHolder = holderResult as boolean
       }
 
       setPool({
@@ -96,14 +105,15 @@ export function useMatchPredictions(
         draw: formatEther(drawPool),
         away: formatEther(awayPool),
         settled,
+        seedCommitted,
         winner: settled ? (outcomes[winnerIdx] ?? null) : null,
         myStake,
+        isFlwcHolder,
       })
     } catch {
-      // Pool doesn't exist yet — that's fine, show empty
       setPool(EMPTY_POOL)
     }
-  }, [account, readContract])
+  }, [account, readContract, cycle])
 
   useEffect(() => {
     if (!provider) setPool(EMPTY_POOL)
@@ -115,14 +125,12 @@ export function useMatchPredictions(
     setIsPlacing(true)
     setTxError(null)
     try {
-      // Verify we're on Base (chainId 8453) before sending
       const network = await c.runner?.provider?.getNetwork?.()
       if (network && Number(network.chainId) !== 8453) {
         setTxError('Wrong network — switch MetaMask to Base mainnet and try again.')
         setIsPlacing(false)
         return
       }
-
       const value = parseEther(ethAmount)
       const tx = await c.placeBet(matchIdBytes(matchId, cycle), OUTCOME_INDEX[outcome], { value })
       await tx.wait()
@@ -136,6 +144,8 @@ export function useMatchPredictions(
         setTxError(reason)
       } else if (msg.includes('SETTLED')) {
         setTxError('This match is already settled.')
+      } else if (msg.includes('MATCH_STARTED')) {
+        setTxError('Match has already started — betting is closed.')
       } else if (msg.includes('missing revert data') || msg.includes('CALL_EXCEPTION')) {
         setTxError('Transaction failed. Make sure you are on Base mainnet and have enough ETH for gas.')
       } else {
@@ -144,20 +154,22 @@ export function useMatchPredictions(
     } finally {
       setIsPlacing(false)
     }
-  }, [writeContract, refresh])
+  }, [writeContract, refresh, cycle])
 
-  const settle = useCallback(async (matchId: string, outcome: Outcome) => {
+  // settle() is trustless — anyone can call, no winner argument needed
+  const settle = useCallback(async (matchId: string) => {
     const c = writeContract()
     if (!c) return
     setTxError(null)
     try {
-      const tx = await c.settle(matchIdBytes(matchId, cycle), OUTCOME_INDEX[outcome])
+      const tx = await c.settle(matchIdBytes(matchId, cycle))
       await tx.wait()
       await refresh(matchId)
     } catch (err: any) {
-      setTxError(err?.reason ?? err?.shortMessage ?? err?.message ?? 'Settle failed')
+      const msg = err?.reason ?? err?.shortMessage ?? err?.message ?? 'Settle failed'
+      setTxError(msg)
     }
-  }, [writeContract, refresh])
+  }, [writeContract, refresh, cycle])
 
   const claim = useCallback(async (matchId: string) => {
     const c = writeContract()
@@ -170,7 +182,7 @@ export function useMatchPredictions(
     } catch (err: any) {
       setTxError(err?.reason ?? err?.shortMessage ?? err?.message ?? 'Claim failed')
     }
-  }, [writeContract, refresh])
+  }, [writeContract, refresh, cycle])
 
   return { isReady, isOwner, pool, isPlacing, txError, placeBet, settle, claim, refresh }
 }

@@ -1,14 +1,28 @@
 export const MATCH_PREDICTIONS_ABI = [
+  // Betting
   'function placeBet(bytes32 matchId, uint8 outcome) external payable',
-  'function settle(bytes32 matchId, uint8 winner) external',
   'function claim(bytes32 matchId) external',
-  'function getPool(bytes32 matchId) external view returns (uint256 homePool, uint256 drawPool, uint256 awayPool, bool settled, uint8 winner)',
+  // Settlement — anyone can call settle() once seed committed & 20 min elapsed
+  'function openMatch(bytes32 matchId, uint64 kickoff, uint32 homeStrength, uint32 awayStrength) external',
+  'function commitSeed(bytes32 matchId, uint32 blockNumber) external',
+  'function settle(bytes32 matchId) external',
+  'function ownerSettle(bytes32 matchId, uint8 winner) external',
+  // Views
+  'function getPool(bytes32 matchId) external view returns (uint256 homePool, uint256 drawPool, uint256 awayPool, bool settled, uint8 winner, bool seedCommitted)',
   'function myStakes(bytes32 matchId, address user) external view returns (uint256 home, uint256 draw, uint256 away)',
+  'function isFlwcHolder(address user) external view returns (bool)',
   'function owner() view returns (address)',
   'function vault() view returns (address)',
+  // Constants
+  'function FEE_BPS_STANDARD() view returns (uint256)',
+  'function FEE_BPS_HOLDER() view returns (uint256)',
+  'function FLWC_THRESHOLD() view returns (uint256)',
+  // Events
+  'event MatchOpened(bytes32 indexed matchId, uint64 kickoff, uint32 homeStr, uint32 awayStr)',
+  'event SeedCommitted(bytes32 indexed matchId, bytes32 seed, uint32 blockNumber)',
   'event BetPlaced(bytes32 indexed matchId, address indexed user, uint8 outcome, uint256 amount)',
-  'event MatchSettled(bytes32 indexed matchId, uint8 winner)',
-  'event Claimed(bytes32 indexed matchId, address indexed user, uint256 payout)',
+  'event MatchSettled(bytes32 indexed matchId, uint8 winner, uint8 homeGoals, uint8 awayGoals)',
+  'event Claimed(bytes32 indexed matchId, address indexed user, uint256 payout, bool holderDiscount)',
 ] as const
 
 export const MATCH_REGISTRY_ABI = [
